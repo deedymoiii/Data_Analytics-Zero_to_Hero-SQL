@@ -1,2 +1,1 @@
-# Data_Analytics-Zero_to_Hero-SQL
-SQL Project
+# COVID-19 Case Dynamics in the Philippines: Regional Trends, Severity, and Health Outcomes
