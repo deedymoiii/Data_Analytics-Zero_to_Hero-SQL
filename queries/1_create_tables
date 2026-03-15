@@ -1,0 +1,29 @@
+CREATE TABLE public.fact_covid (
+    CaseCode TEXT PRIMARY KEY,
+    Age INT,
+    AgeGroup TEXT,
+    Sex TEXT,
+    DateSpecimen DATE,
+    DateResultRelease DATE,
+    DateRepConf DATE,
+    DateDied DATE,
+    DateRecover DATE,
+    RemovalType TEXT,
+    Admitted TEXT,
+    RegionRes TEXT,
+    ProvRes TEXT,
+    CityMunRes TEXT,
+    CityMuniPSGC TEXT,
+    BarangayRes TEXT,
+    BarangayPSGC TEXT,
+    HealthStatus TEXT,
+    Quarantined TEXT,
+    DateOnset TEXT,
+    Pregnanttab TEXT,
+    ValidationStatus TEXT
+);
+
+-- For validation
+SELECT *
+FROM fact_covid
+LIMIT 20;
