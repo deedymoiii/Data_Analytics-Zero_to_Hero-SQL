@@ -1,5 +1,5 @@
-CREATE TABLE public.fact_covid (
-    CaseCode TEXT PRIMARY KEY,
+CREATE TABLE public.covid_cases_raw (
+    CaseCode TEXT,
     Age INT,
     AgeGroup TEXT,
     Sex TEXT,
@@ -23,7 +23,43 @@ CREATE TABLE public.fact_covid (
     ValidationStatus TEXT
 );
 
+CREATE TABLE public.dim_agegroup (
+    agegroup_id SERIAL PRIMARY KEY,
+    AgeGroup TEXT UNIQUE
+);
+
+INSERT INTO dim_agegroup (AgeGroup)
+    SELECT DISTINCT AgeGroup
+    FROM covid_cases_raw;
+
+CREATE TABLE public.dim_region (
+    region_id SERIAL PRIMARY KEY,
+    RegionRes TEXT UNIQUE
+);
+
+INSERT INTO dim_region (RegionRes)
+    SELECT DISTINCT RegionRes
+    FROM covid_cases_raw;
+
+CREATE TABLE public.dim_sex (
+    sex_id SERIAL PRIMARY KEY,
+    Sex TEXT UNIQUE
+);
+
+INSERT INTO dim_sex (Sex)
+    SELECT DISTINCT Sex
+    FROM covid_cases_raw;
+
+CREATE TABLE public.dim_outcome (
+    outcome_id SERIAL PRIMARY KEY,
+    HealthStatus TEXT UNIQUE
+);
+
+INSERT INTO dim_outcome (HealthStatus)
+    SELECT DISTINCT HealthStatus
+    FROM covid_cases_raw;
+
 -- For validation
 SELECT *
-FROM fact_covid
+FROM dim_outcome
 LIMIT 20;
