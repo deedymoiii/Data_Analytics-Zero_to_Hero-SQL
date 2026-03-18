@@ -23,6 +23,7 @@ CREATE TABLE public.covid_cases_raw (
     ValidationStatus TEXT
 );
 
+-- Age dimension
 CREATE TABLE public.dim_agegroup (
     agegroup_id SERIAL PRIMARY KEY,
     AgeGroup TEXT UNIQUE
@@ -32,6 +33,7 @@ INSERT INTO dim_agegroup (AgeGroup)
     SELECT DISTINCT AgeGroup
     FROM covid_cases_raw;
 
+-- Region dimension
 CREATE TABLE public.dim_region (
     region_id SERIAL PRIMARY KEY,
     RegionRes TEXT UNIQUE
@@ -41,6 +43,7 @@ INSERT INTO dim_region (RegionRes)
     SELECT DISTINCT RegionRes
     FROM covid_cases_raw;
 
+-- Sex dimension
 CREATE TABLE public.dim_sex (
     sex_id SERIAL PRIMARY KEY,
     Sex TEXT UNIQUE
@@ -50,6 +53,7 @@ INSERT INTO dim_sex (Sex)
     SELECT DISTINCT Sex
     FROM covid_cases_raw;
 
+-- Outcome dimension
 CREATE TABLE public.dim_outcome (
     outcome_id SERIAL PRIMARY KEY,
     HealthStatus TEXT UNIQUE
@@ -59,7 +63,68 @@ INSERT INTO dim_outcome (HealthStatus)
     SELECT DISTINCT HealthStatus
     FROM covid_cases_raw;
 
+-- Date dimension
+CREATE TABLE public.dim_date AS
+    SELECT
+        TO_CHAR(d, 'YYYYMMDD')::INT AS date_id,
+        d,
+        TRIM(TO_CHAR(d, 'Month')) AS month_name,
+        TRIM(TO_CHAR(d, 'Day')) AS day_name,
+        EXTRACT(QUARTER FROM d) AS quarter,
+        EXTRACT(YEAR FROM d) AS year,
+        EXTRACT(MONTH FROM d) AS month,
+        EXTRACT(DAY FROM d) AS day
+    FROM 
+        generate_series(
+            '2020-01-01'::DATE, 
+            '2021-12-31'::DATE, 
+            '1 day'::INTERVAL
+        ) AS d;
+
+ALTER TABLE dim_date
+ADD PRIMARY KEY (date_id);
+
+CREATE TABLE public.covid_fact (
+    CaseCode TEXT PRIMARY KEY,
+    Age INT,
+    agegroup_id INT,
+    date_id INT,
+    outcome_id INT,
+    region_id INT,
+    sex_id INT,
+    date_died_id INT,
+    date_recovered_id INT,
+    date_confirmed_id INT
+);
+
+INSERT INTO covid_fact
+SELECT
+    r.casecode,
+    r.age,
+    a.agegroup_id,
+    o.outcome_id,
+    reg.region_id,
+    s.sex_id,
+    d_died.date_id AS date_died_id,
+    d_recovered.date_id AS date_recovered_id,
+    d_confirmed.date_id AS date_confirmed_id
+FROM covid_cases_raw AS r
+JOIN dim_agegroup as a
+    ON r.agegroup = a.agegroup
+JOIN dim_outcome as o
+    ON r.healthstatus = o.healthstatus
+JOIN dim_region as reg
+    ON r.regionres = reg.regionres
+JOIN dim_sex as s
+    ON r.sex = s.sex
+LEFT JOIN dim_date AS d_died
+    ON r.datedied = d_died.d
+LEFT JOIN dim_date AS d_recovered
+    ON r.daterecover = d_recovered.d
+LEFT JOIN dim_date AS d_confirmed
+    ON r.daterepconf = d_confirmed.d
+
 -- For validation
 SELECT *
-FROM dim_outcome
+FROM dim_sex
 LIMIT 20;
