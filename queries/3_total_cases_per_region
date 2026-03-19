@@ -1,0 +1,10 @@
+SELECT
+    dimreg.regionres,
+    COUNT(casecode)
+FROM covid_fact
+JOIN dim_region AS dimreg
+    ON dimreg.region_id = covid_fact.region_id
+GROUP BY dimreg.regionres;
+
+SELECT DISTINCT regionres
+FROM covid_cases_raw;

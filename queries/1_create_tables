@@ -88,7 +88,6 @@ CREATE TABLE public.covid_fact (
     CaseCode TEXT PRIMARY KEY,
     Age INT,
     agegroup_id INT,
-    date_id INT,
     outcome_id INT,
     region_id INT,
     sex_id INT,
@@ -122,7 +121,7 @@ LEFT JOIN dim_date AS d_died
 LEFT JOIN dim_date AS d_recovered
     ON r.daterecover = d_recovered.d
 LEFT JOIN dim_date AS d_confirmed
-    ON r.daterepconf = d_confirmed.d
+    ON r.daterepconf = d_confirmed.d;
 
 -- For validation
 SELECT *
