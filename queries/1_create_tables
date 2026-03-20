@@ -40,7 +40,8 @@ CREATE TABLE public.dim_region (
 );
 
 INSERT INTO dim_region (RegionRes)
-    SELECT DISTINCT RegionRes
+    SELECT 
+        DISTINCT COALESCE(RegionRes, 'Unknown')
     FROM covid_cases_raw;
 
 -- Sex dimension
@@ -113,7 +114,7 @@ JOIN dim_agegroup as a
 JOIN dim_outcome as o
     ON r.healthstatus = o.healthstatus
 JOIN dim_region as reg
-    ON r.regionres = reg.regionres
+    ON COALESCE(r.regionres, 'Unknown') = reg.regionres
 JOIN dim_sex as s
     ON r.sex = s.sex
 LEFT JOIN dim_date AS d_died
@@ -125,5 +126,4 @@ LEFT JOIN dim_date AS d_confirmed
 
 -- For validation
 SELECT *
-FROM dim_sex
-LIMIT 20;
+FROM dim_region;

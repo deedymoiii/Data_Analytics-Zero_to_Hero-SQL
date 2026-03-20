@@ -1,13 +1,14 @@
 SELECT
-    regionres,
-    COUNT(casecode)
-FROM covid_fact
-JOIN dim_region AS dimreg
-    ON dimreg.region_id = covid_fact.region_id
-GROUP BY regionres;
+    SUM(case_count)
+FROM (
+    SELECT
+        regionres,
+        COUNT(casecode) AS case_count
+    FROM covid_fact
+    JOIN dim_region AS dimreg
+        ON dimreg.region_id = covid_fact.region_id
+    GROUP BY regionres
+) t;
 
-SELECT COUNT(*)
-FROM covid_cases_raw AS r
-
-JOIN dim_region AS reg
-    ON r.regionres = reg.regionres;
+SELECT *
+FROM dim_region;
